@@ -1,0 +1,5 @@
+2026/04/30-20:13:29.842 39 Creating DB /home/errachdi/wasla/scripts/bridge/.session/session/Default/Local Storage/leveldb since it was missing.
+2026/04/30-20:13:29.884 39 Reusing MANIFEST /home/errachdi/wasla/scripts/bridge/.session/session/Default/Local Storage/leveldb/MANIFEST-000001
+2026/04/30-21:39:54.487 3a Level-0 table #5: started
+2026/04/30-21:39:54.504 3a Level-0 table #5: 17885 bytes OK
+2026/04/30-21:39:54.509 3a Delete type=0 #3

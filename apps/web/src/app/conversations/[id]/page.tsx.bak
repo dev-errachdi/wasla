@@ -1,0 +1,426 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import {
+  ArrowRight,
+  Send,
+  Trash2,
+  Phone,
+  Clock,
+  User,
+  MessageCircle,
+  UserPlus,
+  UserX,
+  BadgeInfo,
+  RefreshCw,
+} from "lucide-react";
+import {
+  getConversation,
+  sendMessage,
+  updateConversationStatus,
+  deleteConversation,
+  assignConversationToMe,
+  unassignConversation,
+} from "@/lib/api";
+import { getUser, logout } from "@/lib/auth";
+import { User as AppUser } from "@/types";
+
+interface Message {
+  id: number;
+  sender: string;
+  direction?: string;
+  source?: string;
+  content: string;
+  message_type: string;
+  created_at: string;
+}
+
+interface ConversationDetail {
+  id: number;
+  status: string;
+  source?: string;
+  created_at: string;
+  updated_at: string;
+  contact: {
+    id: number;
+    name: string;
+    phone: string;
+    email?: string | null;
+    created_at: string;
+  };
+  assigned_user?: AppUser | null;
+  messages: Message[];
+}
+
+const statusColors: Record<string, string> = {
+  new: "bg-blue-500",
+  open: "bg-green-500",
+  pending: "bg-yellow-500",
+  closed: "bg-gray-400",
+};
+
+function formatCustomerId(id: number) {
+  return `C-${String(id).padStart(6, "0")}`;
+}
+
+export default function ConversationPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = Number(params.id);
+  const currentUser = getUser();
+
+  const [conversation, setConversation] = useState<ConversationDetail | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+  const [error, setError] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const fetchConversation = useCallback(
+    async (silent = false) => {
+      try {
+        if (!initialLoaded && !silent) {
+          setLoading(true);
+        } else {
+          setRefreshing(true);
+        }
+
+        const data = await getConversation(id);
+        setConversation(data);
+        setError("");
+      } catch (err) {
+        console.error(err);
+        if (err instanceof Error && err.message === "UNAUTHORIZED") {
+          logout();
+          return;
+        }
+        setError("فشل تحميل المحادثة");
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+        setInitialLoaded(true);
+      }
+    },
+    [id, initialLoaded]
+  );
+
+  useEffect(() => {
+    if (id) fetchConversation();
+  }, [id, fetchConversation]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchConversation(true);
+      }
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [id, fetchConversation]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+
+    try {
+      setSending(true);
+      await sendMessage(id, {
+        sender: "agent",
+        content: newMessage,
+        message_type: "text",
+      });
+      setNewMessage("");
+      fetchConversation(true);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "UNAUTHORIZED") {
+        logout();
+        return;
+      }
+      alert("فشل إرسال الرسالة");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      await updateConversationStatus(id, newStatus as any);
+      fetchConversation(true);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "UNAUTHORIZED") {
+        logout();
+        return;
+      }
+      alert("فشل تحديث الحالة");
+    }
+  };
+
+  const handleAssignToMe = async () => {
+    try {
+      await assignConversationToMe(id);
+      fetchConversation(true);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "UNAUTHORIZED") {
+        logout();
+        return;
+      }
+      alert("فشل تعيين المحادثة");
+    }
+  };
+
+  const handleUnassign = async () => {
+    try {
+      await unassignConversation(id);
+      fetchConversation(true);
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "UNAUTHORIZED") {
+        logout();
+        return;
+      }
+      alert("فشل إلغاء التعيين");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("هل أنت متأكد من حذف هذه المحادثة؟")) return;
+
+    try {
+      await deleteConversation(id);
+      router.push("/");
+    } catch (err) {
+      console.error(err);
+      if (err instanceof Error && err.message === "UNAUTHORIZED") {
+        logout();
+        return;
+      }
+      alert("فشل حذف المحادثة");
+    }
+  };
+
+  if (loading && !initialLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-gray-400">جاري التحميل...</p>
+      </div>
+    );
+  }
+
+  if ((error && !conversation) || !conversation) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-red-500">{error || "المحادثة غير موجودة"}</p>
+      </div>
+    );
+  }
+
+  const isAssignedToMe = conversation.assigned_user?.id === currentUser?.id;
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col" dir="rtl">
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/")}
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition"
+            >
+              <ArrowRight size={18} />
+            </button>
+
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <span className="text-blue-600 font-bold">
+                {conversation.contact.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+
+            <div>
+              <h1 className="font-bold text-gray-900">
+                {conversation.contact.name}
+              </h1>
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Phone size={10} />
+                <span>{conversation.contact.phone}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => fetchConversation(true)}
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition"
+            >
+              <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+            </button>
+
+            <select
+              value={conversation.status}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className={`text-white text-xs px-3 py-1.5 rounded-full border-0 cursor-pointer ${
+                statusColors[conversation.status] || "bg-gray-400"
+              }`}
+            >
+              <option value="new">جديد</option>
+              <option value="open">مفتوح</option>
+              <option value="pending">انتظار</option>
+              <option value="closed">مغلق</option>
+            </select>
+
+            {!isAssignedToMe ? (
+              <button
+                onClick={handleAssignToMe}
+                className="p-2 text-purple-500 hover:text-purple-700 rounded-lg hover:bg-purple-50 transition"
+                title="تعيين لي"
+              >
+                <UserPlus size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={handleUnassign}
+                className="p-2 text-purple-500 hover:text-purple-700 rounded-lg hover:bg-purple-50 transition"
+                title="إلغاء التعيين"
+              >
+                <UserX size={16} />
+              </button>
+            )}
+
+            <button
+              onClick={handleDelete}
+              className="p-2 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {refreshing && (
+        <div className="bg-blue-50 border-b border-blue-100 px-6 py-2 text-xs text-blue-500">
+          <div className="max-w-4xl mx-auto">جاري تحديث المحادثة...</div>
+        </div>
+      )}
+
+      <div className="bg-white border-b border-gray-100 px-6 py-2">
+        <div className="max-w-4xl mx-auto flex flex-wrap items-center gap-6 text-xs text-gray-400">
+          <div className="flex items-center gap-1">
+            <User size={12} />
+            <span>العميل: {conversation.contact.name}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Phone size={12} />
+            <span>الهاتف / معرف واتساب: {conversation.contact.phone}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <BadgeInfo size={12} />
+            <span>ID العميل: {formatCustomerId(conversation.contact.id)}</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Clock size={12} />
+            <span>
+              أُنشئت:{" "}
+              {new Date(conversation.created_at).toLocaleDateString("ar-MA")}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <MessageCircle size={12} />
+            <span>{conversation.messages.length} رسالة</span>
+          </div>
+
+          <div className="flex items-center gap-1 text-purple-500">
+            <User size={12} />
+            <span>
+              المسؤول:{" "}
+              {conversation.assigned_user
+                ? `${conversation.assigned_user.name}${
+                    isAssignedToMe ? " (أنا)" : ""
+                  }`
+                : "غير معين"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="max-w-4xl mx-auto space-y-4">
+          {conversation.messages.length === 0 ? (
+            <div className="text-center py-12 text-gray-400">
+              <MessageCircle size={40} className="mx-auto mb-3 opacity-30" />
+              <p className="text-sm">لا توجد رسائل بعد</p>
+            </div>
+          ) : (
+            conversation.messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${
+                  msg.sender === "agent" ? "justify-start" : "justify-end"
+                }`}
+              >
+                <div
+                  className={`max-w-[70%] rounded-2xl px-4 py-3 ${
+                    msg.sender === "agent"
+                      ? "bg-blue-600 text-white rounded-br-md"
+                      : "bg-white text-gray-800 border border-gray-200 rounded-bl-md"
+                  }`}
+                >
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                  <div
+                    className={`text-xs mt-1 ${
+                      msg.sender === "agent"
+                        ? "text-blue-200"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    <span>
+                      {msg.sender === "agent" ? "أنت" : "العميل"} •{" "}
+                      {new Date(msg.created_at).toLocaleDateString("ar-MA")} •{" "}
+                      {new Date(msg.created_at).toLocaleTimeString("ar-MA", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div className="bg-white border-t border-gray-200 px-6 py-4">
+        <form
+          onSubmit={handleSendMessage}
+          className="max-w-4xl mx-auto flex items-center gap-3"
+        >
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="اكتب رسالة..."
+            className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={sending}
+          />
+          <button
+            type="submit"
+            disabled={sending || !newMessage.trim()}
+            className="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            <Send size={18} />
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,133 @@
+
+وصلة
+نظام إدارة المحادثات
+
+A
+admin
+
+محادثة جديدة
+خروج
+0
+
+الكل
+
+0
+
+جديد
+
+0
+
+مفتوح
+
+0
+
+انتظار
+
+0
+
+مغلق
+
+ابحث بالاسم أو الهاتف...
+كل المحادثات
+محادثاتي
+غير معينة
+الكل
+جديد
+مفتوح
+انتظار
+مغلق
+لا يمكن الاتصال بالخادم ❌ 
+errachdi@DESKTOP-UE9L4HP:~/wasla$ cd ~/wasla/apps/api
+errachdi@DESKTOP-UE9L4HP:~/wasla/apps/api$ source venv/bin/activate
+(venv) errachdi@DESKTOP-UE9L4HP:~/wasla/apps/api$ uvicorn main:app --reload --host 0.0.0.0 --port 8000
+INFO:     Will watch for changes in these directories: ['/home/errachdi/wasla/apps/api']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [2247] using WatchFiles
+INFO:     Started server process [2270]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:50968 - "OPTIONS /auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50968 - "POST /auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50978 - "OPTIONS /auth/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50978 - "POST /auth/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50978 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50980 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50980 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50978 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50978 - "OPTIONS /conversations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50978 - "GET /conversations HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/uvicorn/protocols/http/httptools_impl.py", line 421, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/uvicorn/middleware/proxy_headers.py", line 56, in __call__
+    return await self.app(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 96, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/middleware/cors.py", line 154, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/fastapi/routing.py", line 330, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/starlette/concurrency.py", line 32, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/anyio/to_thread.py", line 63, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 2518, in run_sync_in_worker_thread
+    return await future
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py", line 1002, in run
+    result = context.run(func, *args)
+  File "/home/errachdi/wasla/apps/api/main.py", line 230, in list_conversations
+    conversations = query.order_by(Conversation.updated_at.desc()).all()
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/orm/query.py", line 2711, in all
+    return self._iter().all()  # type: ignore
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 1799, in all
+    return self._allrows()
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 560, in _allrows
+    rows = self._fetchall_impl()
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 1706, in _fetchall_impl
+    return self._real_result._fetchall_impl()
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 2310, in _fetchall_impl
+    return list(self.iterator)
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/orm/loading.py", line 220, in chunks
+    fetch = cursor._raw_all_rows()
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 553, in _raw_all_rows
+    return [make_row(row) for row in rows]
+  File "/home/errachdi/wasla/apps/api/venv/lib/python3.10/site-packages/sqlalchemy/engine/result.py", line 553, in <listcomp>
+    return [make_row(row) for row in rows]
+  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 22, in sqlalchemy.cyextension.resultproxy.BaseRow.__init__
+  File "lib/sqlalchemy/cyextension/resultproxy.pyx", line 79, in sqlalchemy.cyextension.resultproxy._apply_processors
+  File "lib/sqlalchemy/cyextension/processors.pyx", line 40, in sqlalchemy.cyextension.processors.str_to_datetime
+ValueError: Invalid isoformat string: '2026-04-30T19:27:43.204Z'
+^A

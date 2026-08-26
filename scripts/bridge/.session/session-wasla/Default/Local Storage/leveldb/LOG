@@ -1,0 +1,5 @@
+2026/05/03-01:56:53.678 2629 Reusing MANIFEST /home/errachdi/wasla/scripts/bridge/.session/session-wasla/Default/Local Storage/leveldb/MANIFEST-000001
+2026/05/03-01:56:53.698 2629 Recovering log #23
+2026/05/03-01:56:53.698 2629 Level-0 table #26: started
+2026/05/03-01:56:53.768 2629 Level-0 table #26: 15859 bytes OK
+2026/05/03-01:56:53.833 2629 Delete type=0 #23
