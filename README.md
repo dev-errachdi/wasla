@@ -1,4 +1,3 @@
-```markdown
 # 💬 WASLA | وصلة
 
 <p align="center">
@@ -52,12 +51,11 @@ wasla/
 
 ---
 
-## 🛠️ Prérequis et Dépendances Système (Ce dont le projet a besoin)
+## 🛠️ Prérequis et Dépendances Système
 
-Pour faire tourner le projet localement (notamment sur **WSL2 / Ubuntu / Linux**), vous devez installer les dépendances système suivantes pour que Puppeteer (utilisé par le Bridge) fonctionne sans erreurs :
+Pour faire tourner le projet localement (notamment sur **WSL2 / Ubuntu / Linux**), installez les dépendances suivantes :
 
-### 1. Dépendances Système requises (Linux / WSL2) :
-Exécutez cette commande dans votre terminal pour installer toutes les bibliothèques nécessaires au bon fonctionnement du navigateur Chromium :
+### 1. Dépendances Système (Linux / WSL2) :
 ```bash
 sudo apt update && sudo apt install -y \
   libgbm-dev \
@@ -73,15 +71,15 @@ sudo apt update && sudo apt install -y \
 
 ### 2. Environnements de développement requis :
 - **Node.js :** Version 18 ou 20+
-- **pnpm :** Gestionnaire de paquets global (`npm install -g pnpm`)
+- **pnpm :** `npm install -g pnpm`
 - **Python :** Version 3.10+ avec `venv` et `pip`
-- **SQLite3 :** Installé par défaut sur la plupart des systèmes
+- **SQLite3 :** Installé par défaut
 
 ---
 
 ## 📦 Installation et Configuration initiale
 
-### Étape 1 : Cloner le projet et installer les paquets globaux
+### Étape 1 : Cloner et installer les paquets globaux
 ```bash
 cd wasla
 pnpm install
@@ -93,18 +91,17 @@ cd apps/api
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-# La base de données 'wasla.db' sera générée automatiquement lors du premier démarrage.
 cd ../..
 ```
 
-### Étape 3 : Configurer l'interface Frontend (Next.js)
+### Étape 3 : Configurer le Frontend (Next.js)
 ```bash
 cd apps/web
 pnpm install
 cd ../..
 ```
 
-### Étape 4 : Configurer le WhatsApp Bridge (Node.js)
+### Étape 4 : Configurer le Bridge WhatsApp
 ```bash
 cd scripts/bridge
 npm install
@@ -113,50 +110,42 @@ cd ../..
 
 ---
 
-## 🖥️ Démarrage Quotidien (Running the Project)
+## 🖥️ Démarrage Quotidien (3 Terminaux)
 
-Pour démarrer l'application complète, vous devez ouvrir **3 terminaux distincts** :
-
-### 🔲 Terminal 1 : Le Backend (FastAPI)
+### 🔲 Terminal 1 : Backend (FastAPI)
 ```bash
 cd ~/wasla/apps/api
 source venv/bin/activate
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
-* **Lien de l'API :** `http://localhost:8000`
-* **Lien Swagger (Doc API) :** `http://localhost:8000/docs`
+> API : `http://localhost:8000` | Swagger : `http://localhost:8000/docs`
 
----
-
-### 🔲 Terminal 2 : L'interface Web (Next.js)
+### 🔲 Terminal 2 : Frontend (Next.js)
 ```bash
 cd ~/wasla/apps/web
 pnpm dev
 ```
-* **Lien de l'application :** `http://localhost:3000`
+> Interface : `http://localhost:3000`
 
----
-
-### 🔲 Terminal 3 : Le Bridge WhatsApp (Node.js)
+### 🔲 Terminal 3 : Bridge WhatsApp
 ```bash
 cd ~/wasla/scripts/bridge
 node index.js
 ```
-> **Note Importante :** Au premier lancement, scannez le **QR Code** qui s'affiche dans ce terminal avec l'application WhatsApp de votre téléphone (Appareils connectés). La session sera enregistrée localement dans le dossier `~/wasla/scripts/bridge/.session/`.
+> **Note :** Au premier lancement, scannez le **QR Code** affiché dans le terminal avec WhatsApp (Appareils connectés). Session sauvegardée dans `~/wasla/scripts/bridge/.session/`.
 
 ---
 
-## 🔒 Sécurité et Fichiers Locaux générés
+## 🔒 Sécurité et Fichiers Locaux
 
-Voici les fichiers importants créés localement qu'il faut garder sécurisés (déjà ignorés dans `.gitignore`) :
 - **Base de données :** `~/wasla/apps/api/wasla.db`
 - **Session WhatsApp :** `~/wasla/scripts/bridge/.session`
-- **Fichier d'état (Heartbeat) :** `~/wasla/.bridge-heartbeat.json`
+- **Heartbeat :** `~/wasla/.bridge-heartbeat.json`
+- ⚠️ Ajoutez `.session` et `wasla.db` dans `.gitignore`
 
 ---
 
 ## 📄 Licence & Crédits
 
-Projet conçu et réalisé avec succès par **Mohamad Errachdi** avec le support complet de l'Intelligence Artificielle.  
+Projet conçu et réalisé par **Mohamad Errachdi** avec le support de l'Intelligence Artificielle.  
 *Libre d'utilisation et d'adaptation pour vos besoins professionnels locaux !*
-```
